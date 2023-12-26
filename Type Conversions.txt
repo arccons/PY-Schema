@@ -1,0 +1,20 @@
+SQL type	Python type
+bigint	float64
+binary	bytes
+bit	bool
+char	str
+date	datetime
+datetime	datetime
+float	float64
+nchar	str
+nvarchar	str
+nvarchar(max)	str
+real	float64
+smalldatetime	datetime
+smallint	int32
+tinyint	int32
+uniqueidentifier	str
+varbinary	bytes
+varbinary(max)	bytes
+varchar(n)	str
+varchar(max)	str
