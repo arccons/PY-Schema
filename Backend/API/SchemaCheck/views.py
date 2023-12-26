@@ -17,6 +17,6 @@ def processFile(request):
     row = getFileSubject(request.data['subject'])
     if not row:
         return Response(None)
-    fileDtypes = processUploadedFile(request.data['uploadedFile'], request.data['fileType'], request.data['subject'])
+    fileDtypes = processUploadedFile(request.data['uploadedFile'], request.data['fileType'])
     print(fileDtypes)
     return Response({"message": "Got some data!"})

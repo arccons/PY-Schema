@@ -9,7 +9,7 @@ def getFileSubject(subject):
 
     return row
 
-def processUploadedFile(uploadedFile, fileType, subject):
+def processUploadedFile(uploadedFile, fileType):
     fileDF = pandas.DataFrame()
     if fileType == 'text/csv':
         fileDF = pandas.read_csv(uploadedFile)
