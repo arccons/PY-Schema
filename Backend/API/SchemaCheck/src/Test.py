@@ -1,4 +1,5 @@
 import pandas
+import numpy
 import SchemaCheck.src.MSsql as MSsql
 
 def getFileSubject(subject):
@@ -12,11 +13,18 @@ def getFileSubject(subject):
 def processUploadedFile(uploadedFile, fileType):
     fileDF = pandas.DataFrame()
     if fileType == 'text/csv':
-        fileDF = pandas.read_csv(uploadedFile)
+        fileDF = pandas.read_csv(uploadedFile, parse_dates=True, dayfirst=True)
+        # First convert datetime columns
+        fileDF = fileDF.apply(lambda col: pandas.to_datetime(col, dayfirst=True, errors='ignore') 
+              if col.dtypes == object 
+              else col, 
+              axis=0)
+        # Then convert string columns
+        fileDF = fileDF.apply(lambda col: col.astype('string')
+              if col.dtypes == object 
+              else col, 
+              axis=0)
     else:
-        print(fileType)
         fileDF = pandas.read_excel(uploadedFile)
 
-    print(fileDF)
-            
-    return fileDF.dtypes
+    return fileDF
