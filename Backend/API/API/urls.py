@@ -21,5 +21,6 @@ from SchemaCheck import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.getData),
+    path('getSubjectList/', views.getSubjectList),
     path('processFile/', views.processFile),
 ]
