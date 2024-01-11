@@ -15,22 +15,25 @@ def getData(request):
 @permission_classes((permissions.AllowAny,))
 def getSubjectList(request):
     rowList = FP.getSubjectList()
-    print(rowList)
+    print(f"Subject List = \n{rowList}")
     return Response(rowList)
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def processFile(request):
-    subjExists = FP.checkSubject(request.data['subject'])
+    subjBaseExists = FP.checkSubject(request.data['subject'])
     fileDF = FP.processUploadedFile(request.data['uploadedFile'], request.data['fileType'])
-    print(fileDF)
-    print(fileDF.dtypes)
+    print(f"FileDF = \n{fileDF}")
+    print(f"FileDF.dtypes = \n{fileDF.dtypes}")
 
-    if subjExists:
-        tableDF = FP.getTableColumns(request.data['subject'])
-        FP.addFileRecords(tableDF)
+    if not subjBaseExists:
+        subjBaseExists = FP.createSubjectBase(fileDF, request.data['table'], request.data['subject'])
+
+    recordsExist = False
+    if subjBaseExists:
+        recordsExist = FP.addFileRecords(fileDF, request.data['subject'])
+
+    if recordsExist:
+        return Response({"message": "File uploaded!"})
     else:
-        FP.createDBobjects(fileDF, request.data['table'], request.data['subject'])
-        FP.addFileRecords(fileDF)
-
-    return Response({"message": "Got some data!"})
+        return Response({"message": "Error!"})

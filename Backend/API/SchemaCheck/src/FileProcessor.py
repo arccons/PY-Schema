@@ -5,9 +5,7 @@ def checkSubject(subject):
     return MSsql.checkSubject(subject)
 
 def getSubjectList():
-    rowList = MSsql.getSubjectList()
-    print(f"Subject List = {rowList}")
-    return pandas.DataFrame.from_records(rowList, columns=['SUBJECT'])
+    return pandas.DataFrame.from_records(MSsql.getSubjectList(), columns=['SUBJECT'])
 
 def processUploadedFile(uploadedFile, fileType):
     fileDF = pandas.DataFrame()
@@ -28,33 +26,51 @@ def processUploadedFile(uploadedFile, fileType):
 
     return fileDF
 
-def getTableColumns(subject):
-    return pandas.DataFrame.from_records(MSsql.getTableColumns(subject), columns=['ordinal','col', 'data_type'])
+def getTableColumns(table):
+    return pandas.DataFrame.from_records(MSsql.getTableColumns(table), columns=['ordinal','col', 'data_type'])
 
-def createDBobjects(fileDF, tableName, subject):
-    MSsql.createDBobjects(tableName, subject)
-    subject_table_stg = tableName + '_STG'
-    print(f"{subject_table_stg}")
+def createSubjectBase(fileDF, tableName, subject):
+    tablesExist = MSsql.createSubjectBase(tableName, subject)
+    if not tablesExist:
+        return False
+
     print(f"File data types: \n{fileDF.dtypes}")
-    for item in fileDF.dtypes:
-        print(f"item = {item}")
-        if item == 'float64':
-            MSsql.addFloatColumn(tableName, item)
-            MSsql.addFloatColumn(subject_table_stg, item)
-        elif item == 'int64':
-            MSsql.addIntColumn(tableName, item)
-            MSsql.addIntColumn(subject_table_stg, item)
-        elif item == 'bool':
-            MSsql.addBoolColumn(tableName, item)
-            MSsql.addBoolColumn(subject_table_stg, item)
-        elif item == 'string[Python]':
-            MSsql.addStringColumn(tableName, item)
-            MSsql.addStringColumn(subject_table_stg, item)
-        elif item == 'datetime[ns]':
-            MSsql.addDateColumn(tableName, item)
-            MSsql.addDateColumn(subject_table_stg, item)
+    print(f"File columns: \n{fileDF.columns}")
+    for col in fileDF.columns:
+        colType = fileDF[col].dtypes
+        print(f"Column type = {colType}")
+        if colType == 'float64':
+            MSsql.addFloatColumn(tableName, col)
+        elif colType == 'int64':
+            MSsql.addIntColumn(tableName, col)
+        elif colType == 'bool':
+            MSsql.addBoolColumn(tableName, col)
+        elif colType == 'string':
+            MSsql.addStringColumn(tableName, col)
+        elif colType == 'datetime64[ns]':
+            MSsql.addDateColumn(tableName, col)
 
     return True
 
-def addFileRecords(tableDF):
-    return MSsql.addFileRecords(tableDF)
+def addFileRecords(fileDF, subject):
+    stgTable = MSsql.getTable(subject) + '_STG'
+    tableDF = pandas.DataFrame.from_records(MSsql.getTableColumns(stgTable), columns=['ORDINAL_POSITION', 'column_name', 'data_type'])
+    #stgTableRow = MSsql.getTableColumns(stgTable)
+    #row_to_list = [elem for elem in row]
+    stgTableCols = [elem[1] for elem in tableDF.values.tolist()]
+    print(f"Staging table columns type = {type(stgTableCols)}")
+    print(f"Staging table columns = {stgTableCols}")
+    fileCols = fileDF.columns.tolist()
+    print(f"File DF columns type = {type(fileCols)}")
+    print(f"File DF columns = {fileCols}")
+    tableColNum = len(stgTableCols)
+    fileColNum = len(fileCols)
+    print(f"Number of table columns = {tableColNum - 3}")
+    print(f"Number of file columns = {fileColNum}")
+    if ((tableColNum-3) != fileColNum):
+        return False
+    fileValues = fileDF.values
+    print(f"fileDF = \n{fileDF}")
+    print(f"File DF items = \n{fileValues}")
+    MSsql.addRecords(stgTable, stgTableCols[3:], fileValues)
+    return True
