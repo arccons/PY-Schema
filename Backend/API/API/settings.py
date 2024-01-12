@@ -11,6 +11,19 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Access environment variables
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG') == "True"
+DB_HOST=os.getenv('DB_HOST')
+DATABASE = os.getenv('DATABASE')
+DB_DRIVER = os.getenv('DB_DRIVER')
+TRUSTED_CONNECTION = os.getenv('TRUSTED_CONNECTION')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +33,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!&cp+y4nm1)h2@0!2$7wj8b01_hegru2-1_w9i@@91+(g5anh1'
+#SECRET_KEY = 'django-insecure-!&cp+y4nm1)h2@0!2$7wj8b01_hegru2-1_w9i@@91+(g5anh1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#DEBUG = True
 
 ALLOWED_HOSTS = []
 CORS_ALLOWED_ORIGINS = [
@@ -96,14 +109,11 @@ WSGI_APPLICATION = 'API.wsgi.application'
 DATABASES = {
     'default': {
             'ENGINE': 'mssql',
-            'NAME': 'SchemaCheck',
-            # 'USER': 'dbo@DESKTOP-ALT0UH5',
-            # 'PASSWORD': 'mssql',
-            'HOST': 'DESKTOP-ALT0UH5',
-            'PORT': '',
+            'NAME': DATABASE, #'SchemaCheck',
+            'HOST': DB_HOST, #'DESKTOP-ALT0UH5',
             'OPTIONS': {
-                    'driver': 'ODBC Driver 17 for SQL Server',
-                    'Trusted_Connection': 'yes',
+                    'driver': DB_DRIVER, #'ODBC Driver 17 for SQL Server',
+                    'Trusted_Connection': TRUSTED_CONNECTION, #'yes',
                     },
             },
     }

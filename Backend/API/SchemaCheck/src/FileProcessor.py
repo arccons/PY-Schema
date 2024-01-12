@@ -58,19 +58,19 @@ def addFileRecords(fileDF, subject):
     #stgTableRow = MSsql.getTableColumns(stgTable)
     #row_to_list = [elem for elem in row]
     stgTableCols = [elem[1] for elem in tableDF.values.tolist()]
-    print(f"Staging table columns type = {type(stgTableCols)}")
-    print(f"Staging table columns = {stgTableCols}")
+    #print(f"Staging table columns type = {type(stgTableCols)}")
+    #print(f"Staging table columns = {stgTableCols}")
     fileCols = fileDF.columns.tolist()
-    print(f"File DF columns type = {type(fileCols)}")
-    print(f"File DF columns = {fileCols}")
+    #print(f"File DF columns type = {type(fileCols)}")
+    #print(f"File DF columns = {fileCols}")
     tableColNum = len(stgTableCols)
     fileColNum = len(fileCols)
-    print(f"Number of table columns = {tableColNum - 3}")
-    print(f"Number of file columns = {fileColNum}")
+    #print(f"Number of table columns = {tableColNum - 3}")
+    #print(f"Number of file columns = {fileColNum}")
     if ((tableColNum-3) != fileColNum):
         return False
     fileValues = fileDF.values
-    print(f"fileDF = \n{fileDF}")
-    print(f"File DF items = \n{fileValues}")
+    #print(f"fileDF = \n{fileDF}")
+    #print(f"File DF items = \n{fileValues}")
     MSsql.addRecords(stgTable, stgTableCols[3:], fileValues)
     return True

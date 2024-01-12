@@ -1,15 +1,24 @@
+import os
 import pyodbc
-from datetime import datetime, date
+from datetime import datetime
+
+DATABASE_DRIVER = os.getenv('DATABASE_DRIVER')
+DB_HOST = os.getenv('DB_HOST')
+DATABASE = os.getenv('DATABASE')
+TRUSTED_CONNECTION = os.getenv('TRUSTED_CONNECTION')
 
 def connect_to_DB():
-    DBconn = pyodbc.connect(driver='{SQL Server}', server='DESKTOP-ALT0UH5', database='SchemaCheck', trusted_connection='yes')
+    #print(DATABASE_DRIVER, DB_HOST, DATABASE, TRUSTED_CONNECTION)
+    #DBconn = pyodbc.connect(driver='{SQL Server}', server='DESKTOP-ALT0UH5', database='SchemaCheck', trusted_connection='yes')
+    DBconn = pyodbc.connect(driver=DATABASE_DRIVER, server=DB_HOST, database=DATABASE, trusted_connection=TRUSTED_CONNECTION)
     cursor = DBconn.cursor()
     return cursor
 
 def getSubjectList():
+    pass
     cursor = connect_to_DB()
     sql_stmt = "SELECT DISTINCT SUBJECT from SchemaCheck.dbo.SUBJECTS"
-    print(f"Subject List SQL = {sql_stmt}")
+    #print(f"Subject List SQL = {sql_stmt}")
     cursor.execute(sql_stmt)  
     rowList = cursor.fetchall()
     return rowList
@@ -39,20 +48,21 @@ def getTableColumns(table):
     #print(f"Column List SQL = {sql_stmt}")
     cursor.execute(sql_stmt)
     col_list = cursor.fetchall()
-    print(f"Table columns = {col_list}")
+    #print(f"Table columns = {col_list}")
     return col_list
 
 def createSubjectBase(tableName, subject):
     cursor = connect_to_DB()
-    sql_subject_insert = f"INSERT INTO SchemaCheck.dbo.SUBJECTS (SUBJECT, TABLE_NAME) VALUES ('{subject}', '{tableName}')"
+    valString = f"NEWID(), '{subject}', '{tableName}'"
+    sql_subject_insert = f"INSERT INTO SchemaCheck.dbo.SUBJECTS (ID, SUBJECT, TABLE_NAME) VALUES ({valString})"
     print(f"New SUBJECT SQL = {sql_subject_insert}")
     cursor.execute(sql_subject_insert)
     sql_table_create = f"CREATE TABLE SchemaCheck.dbo.{tableName} ([ID] [uniqueidentifier] NOT NULL, [LOAD_TIMESTAMP] [timestamp] NOT NULL)"
-    print(f"New Subject Table SQL = {sql_table_create}")
+    #print(f"New Subject Table SQL = {sql_table_create}")
     cursor.execute(sql_table_create)
     subject_table_stg = tableName + '_STG'
     sql_table_stg_create = f"CREATE TABLE SchemaCheck.dbo.{subject_table_stg} ([ID] [uniqueidentifier] NOT NULL, [STATUS] [char](10) NOT NULL DEFAULT('LOADED'), [STATUSTIMESTAMP] [timestamp] NOT NULL)"
-    print(f"New Staging Table SQL = {sql_table_stg_create}")
+    #print(f"New Staging Table SQL = {sql_table_stg_create}")
     cursor.execute(sql_table_stg_create)
     cursor.commit()
     return True
@@ -60,10 +70,10 @@ def createSubjectBase(tableName, subject):
 def addStringColumn(table, colName):
     cur = connect_to_DB()
     sql_add_col = f"ALTER TABLE {table} ADD {colName} varchar(255)"
-    print(f"Add column SQL = {sql_add_col}")
+    #print(f"Add column SQL = {sql_add_col}")
     cur.execute(sql_add_col)
     sql_add_col = f"ALTER TABLE {table}_STG ADD {colName} varchar(255)"
-    print(f"Add column SQL = {sql_add_col}")
+    #print(f"Add column SQL = {sql_add_col}")
     cur.execute(sql_add_col)
     cur.commit()
     return True
@@ -71,10 +81,10 @@ def addStringColumn(table, colName):
 def addFloatColumn(table, colName):
     cur = connect_to_DB()
     sql_add_col = f"ALTER TABLE {table} ADD {colName} float"
-    print(f"Add column SQL = {sql_add_col}")
+    #print(f"Add column SQL = {sql_add_col}")
     cur.execute(sql_add_col)
     sql_add_col = f"ALTER TABLE {table}_STG ADD {colName} float"
-    print(f"Add column SQL = {sql_add_col}")
+    #print(f"Add column SQL = {sql_add_col}")
     cur.execute(sql_add_col)
     cur.commit()
     return True
@@ -82,10 +92,10 @@ def addFloatColumn(table, colName):
 def addIntColumn(table, colName):
     cur = connect_to_DB()
     sql_add_col = f"ALTER TABLE {table} ADD {colName} numeric"
-    print(f"Add column SQL = {sql_add_col}")
+    #print(f"Add column SQL = {sql_add_col}")
     cur.execute(sql_add_col)
     sql_add_col = f"ALTER TABLE {table}_STG ADD {colName} numeric"
-    print(f"Add column SQL = {sql_add_col}")
+    #print(f"Add column SQL = {sql_add_col}")
     cur.execute(sql_add_col)
     cur.commit()
     return True
@@ -93,21 +103,21 @@ def addIntColumn(table, colName):
 def addBoolColumn(table, colName):
     cur = connect_to_DB()
     sql_add_col = f"ALTER TABLE {table} ADD {colName} bit"
-    print(f"Add column SQL = {sql_add_col}")
+    #print(f"Add column SQL = {sql_add_col}")
     cur.execute(sql_add_col)
     sql_add_col = f"ALTER TABLE {table}_STG ADD {colName} bit"
-    print(f"Add column SQL = {sql_add_col}")
+    #print(f"Add column SQL = {sql_add_col}")
     cur.execute(sql_add_col)
     cur.commit()
     return True
 
 def addDateColumn(table, colName):
     cur = connect_to_DB()
-    sql_add_col = f"ALTER TABLE {table} ADD {colName} datetime"
-    print(f"Add column SQL = {sql_add_col}")
+    sql_add_col = f"ALTER TABLE {table} ADD {colName} date"
+    #print(f"Add column SQL = {sql_add_col}")
     cur.execute(sql_add_col)
-    sql_add_col = f"ALTER TABLE {table}_STG ADD {colName} datetime"
-    print(f"Add column SQL = {sql_add_col}")
+    sql_add_col = f"ALTER TABLE {table}_STG ADD {colName} date"
+    #print(f"Add staging column SQL = {sql_add_col}")
     cur.execute(sql_add_col)
     cur.commit()
     return True
@@ -117,6 +127,7 @@ def addRecords(table, colList, valList):
     colString = 'ID, ' + ', '.join(colList)
     for item in valList:
         valString = f"NEWID()"
+    
         for i in range(len(item)):
             itemString = ""
 
@@ -127,7 +138,8 @@ def addRecords(table, colList, valList):
             
             isDate = False
             if isinstance(item[i], datetime):
-                itemString = f"{datetime.fromtimestamp(item[i])}"
+                itemString = f"'{str(datetime.date(item[i]))[0:10]}'"
+                print(f"Date string = {itemString}")
                 isDate = True
             
             isString = False
@@ -141,7 +153,7 @@ def addRecords(table, colList, valList):
             valString = valString + ', ' + itemString
         print(f"Column string = {colString}; Value string = {valString}")
         sql_insert_record = f"INSERT INTO {table} ({colString}) VALUES({valString})"
-        print(f"sql_insert_record = {sql_insert_record}")
+        #print(f"sql_insert_record = {sql_insert_record}")
         cur.execute(sql_insert_record)
     cur.commit()
     return True

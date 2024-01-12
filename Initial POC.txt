@@ -1,0 +1,16 @@
+Set up for Initial POC
+
+	DB setup
+		DB=DB_NAME? // SchemaCheck
+		DB setup script
+		Trusted connection
+		No Date/Time columns
+
+	App Server setup
+		Install node.js
+		Install requirements.txt
+		PROD-settings.py update
+
+	Web setup
+		Install React and dependencies
+

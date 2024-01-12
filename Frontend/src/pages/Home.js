@@ -1,5 +1,6 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, Component} from 'react';
 import axios from 'axios';
+import { ButtonUsage } from '../Components/MUI-Components';
 
 const Home = (props) => {
 
@@ -10,6 +11,7 @@ const Home = (props) => {
   const [error, setError] = useState();
   const [subjectList, setSubjectList] = useState([]);
   const [loaded, setLoaded] = useState(false)
+  const [success, setSuccess] = useState(true)
 
   useEffect (() => {
     if (!loaded) {
@@ -65,6 +67,7 @@ const Home = (props) => {
       .then((response) => {
         console.log(response.data);
         setUploadedFile(file);
+        document.getElementById("MainForm").reset();
       })
       .catch((error) => {
         console.error("Error uploading file: ", error);
@@ -74,32 +77,41 @@ const Home = (props) => {
 
   return (
     <div className="App">
-        <form onSubmit={handleSubmit}>
+        <form id="MainForm" onSubmit={handleSubmit}>
           <h1>DB File Upload</h1>
           
           {!props.newSubject &&
             <>
+            <center>
               <label htmlFor="subject">Choose a Subject: </label>
-              <select id="subject" onChange={handleSubjectChange}><option key='0' value="No Selection">Pick One</option>
-                {subjectList.map((sL)=><option key={sL} value={sL}>{sL}</option>)}</select>
-              <br></br>
+                <select id="subject" onChange={handleSubjectChange}><option key='0' value="No Selection">Pick One</option>
+                  {subjectList.map((sL)=><option key={sL} value={sL}>{sL}</option>)}</select>
+                <br></br>
+            </center>
             </>}
           {props.newSubject && 
             <>
-              <label htmlFor="subject">Create a Subject: </label>
-              <input type="text" id="subject" required onChange={handleSubjectChange}/>
-              <br></br>
-              <label htmlFor="table">Table for the Subject: </label>
-              <input type="text" id="table" onChange={handleTableChange} required/>
-              <br></br>
+              <center>
+                <label htmlFor="subject">Create a Subject: </label>
+                  <input type="text" id="subject" required onChange={handleSubjectChange}/>
+                  <br></br>
+                  <label htmlFor="table">Table for the Subject: </label>
+                  <input type="text" id="table" onChange={handleTableChange} required/>
+              </center>
             </>
           }
-          <label htmlFor="file">Choose a File: </label>
-          <input type="file" id="fileToUpload" onChange={handleFileChange}/>
-          <br></br>
-          <button type="submit">Upload</button>
+          <center>
+            <label htmlFor="file">Choose a File: </label>
+            <input type="file" id="fileToUpload" onChange={handleFileChange}/>
+            <br></br>
+            <br></br>
+            <button onSubmit={handleSubmit}>Upload</button>
+            <br></br>
+            <br></br>
+            <text>[Dates will be stored in <b>YYYY-MM-DD</b> format]</text>
+          </center>
         </form>
-        {uploadedFile && <img src={uploadedFile} alt="Uploaded content"/>}
+        {uploadedFile && <center><p><text alt="Uploaded content">File uploaded successfully</text></p></center>}
         {error && <p>Error uploading file: {error.message}</p>}
     </div>
   );
