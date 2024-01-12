@@ -19,7 +19,7 @@ load_dotenv()
 
 # Access environment variables
 SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = os.getenv('DEBUG') == "True"
+DEBUG = os.getenv('DEBUG') == 'True'
 DB_HOST=os.getenv('DB_HOST')
 DATABASE = os.getenv('DATABASE')
 DB_DRIVER = os.getenv('DB_DRIVER')

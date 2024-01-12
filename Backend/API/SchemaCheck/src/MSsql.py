@@ -2,15 +2,15 @@ import os
 import pyodbc
 from datetime import datetime
 
-DATABASE_DRIVER = os.getenv('DATABASE_DRIVER')
+DB_DRIVER = os.getenv('DB_DRIVER')
 DB_HOST = os.getenv('DB_HOST')
 DATABASE = os.getenv('DATABASE')
 TRUSTED_CONNECTION = os.getenv('TRUSTED_CONNECTION')
 
 def connect_to_DB():
-    #print(DATABASE_DRIVER, DB_HOST, DATABASE, TRUSTED_CONNECTION)
+    print(DB_DRIVER, DB_HOST, DATABASE, TRUSTED_CONNECTION)
     #DBconn = pyodbc.connect(driver='{SQL Server}', server='DESKTOP-ALT0UH5', database='SchemaCheck', trusted_connection='yes')
-    DBconn = pyodbc.connect(driver=DATABASE_DRIVER, server=DB_HOST, database=DATABASE, trusted_connection=TRUSTED_CONNECTION)
+    DBconn = pyodbc.connect(driver=DB_DRIVER, server=DB_HOST, database=DATABASE, trusted_connection=TRUSTED_CONNECTION)
     cursor = DBconn.cursor()
     return cursor
 
