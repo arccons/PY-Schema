@@ -20,10 +20,10 @@ load_dotenv()
 # Access environment variables
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG') == 'True'
-DB_HOST=os.getenv('DB_HOST')
-DATABASE = os.getenv('DATABASE')
-DB_DRIVER = os.getenv('DB_DRIVER')
-TRUSTED_CONNECTION = os.getenv('TRUSTED_CONNECTION')
+""" DB_HOST=os.getenv('DB_HOST')
+MSSQL_DATABASE = os.getenv('MSSQL_DATABASE')
+MSSQL_DB_DRIVER = os.getenv('MSSQL_DB_DRIVER')
+MSSQL_TRUSTED_CONNECTION = os.getenv('MSSQL_TRUSTED_CONNECTION') """
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -106,17 +106,45 @@ WSGI_APPLICATION = 'API.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+""" DB='mssql'
+MSSQL_DB_HOST='DESKTOP-ALT0UH5'
+MSSQL_ENGINE='mssql'
+MSSQL_DATABASE='SchemaCheck'
+MSSQL_DB_DRIVER='ODBC Driver 17 for SQL Server'
+MSSQL_TRUSTED_CONNECTION='yes'
+PGSQL_ENGINE='django.db.backends.postgresql' #'django.db.backends.postgresql_psycopg2'
+PGSQL_DB_HOST='localhost'
+PGSQL_DATABASE='SchemaCheck'
+PGSQL_USER='postgres'
+PGSQL_PASSWD='admin'
+PGSQL_PORT=5432 """
+
+if os.getenv('DB') == 'mssql':
+    DB1 = 'default'
+    DB2 = 'postgres'
+elif os.getenv('DB') == 'pgsql':
+    DB1 = 'postgres'
+    DB2 = 'default'
+
 DATABASES = {
-    'default': {
-            'ENGINE': 'mssql',
-            'NAME': DATABASE, #'SchemaCheck',
-            'HOST': DB_HOST, #'DESKTOP-ALT0UH5',
-            'OPTIONS': {
-                    'driver': DB_DRIVER, #'ODBC Driver 17 for SQL Server',
-                    'Trusted_Connection': TRUSTED_CONNECTION, #'yes',
-                    },
-            },
-    }
+    DB1: {
+        'ENGINE': 'mssql',
+        'NAME': os.getenv("MSSQL_DATABASE"), #'SchemaCheck',
+        'HOST': os.getenv("MSSQL_DB_HOST"), #'DESKTOP-ALT0UH5',
+        'OPTIONS': {
+                'driver': os.getenv("MSSQL_DB_DRIVER"), #'ODBC Driver 17 for SQL Server',
+                'Trusted_Connection': os.getenv("MSSQL_TRUSTED_CONNECTION"), #'yes',
+                },
+    },
+    DB2: {
+        "ENGINE": os.getenv("PGSQL_ENGINE"),
+        "NAME": os.getenv("PGSQL_DATABASE"),
+        "USER": os.getenv("PGSQL_USER"),
+        "PASSWORD": os.getenv("PGSQL_PASSWD"),
+        "HOST": os.getenv("PGSQL_DB_HOST"),
+        "PORT": os.getenv("PGSQL_PORT"),
+    },
+}
 
 
 # Password validation
