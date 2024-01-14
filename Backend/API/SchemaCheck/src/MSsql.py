@@ -7,10 +7,10 @@ def connect_to_DB():
     #DBconn = pyodbc.connect(driver='{SQL Server}', server='DESKTOP-ALT0UH5', database='SchemaCheck', trusted_connection='yes')
     DBconn = pyodbc.connect(driver=os.getenv('MSSQL_DB_DRIVER'), server=os.getenv('MSSQL_DB_HOST'), database=os.getenv('MSSQL_DATABASE'), trusted_connection=os.getenv('MSSQL_TRUSTED_CONNECTION'))
     cursor = DBconn.cursor()
-    return cursor
+    return [cursor, DBconn]
 
-def commitCursor(cursor):
-    cursor.commit()
+def commitCursor(DBconn):
+    DBconn.commit()
 
 def getSubjectListSQL():
     sql_stmt = "SELECT DISTINCT SUBJECT, TABLE_NAME from SchemaCheck.dbo.SUBJECTS"
