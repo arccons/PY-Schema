@@ -2,7 +2,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
-import SchemaCheck.src.FileProcessor as FP # processUploadedFile, getFileSubject, getTableColumns
+import SchemaCheck.src.FileProcessor as FP
 import pandas
 
 # Create your views here.
@@ -18,11 +18,11 @@ def getData(request):
 def getSubjectList(request):
     subjectDF = pandas.DataFrame()
     subjectDF = FP.getSubjectList()
-    """ if not subjectDF:
-        return Response({"Error": "Could not get subject and table list."}) """
-    #print(f"Subject List = \n{subjectDF}")
     SUBJECTS = []
     TABLE_NAMES = []
+    #if subjectDF.empty:
+        #return Response({"SUBJECTS": [], "TABLE_NAMES": []}) #, "Error": "Could not get subject and table list."})
+    #print(f"Subject List = \n{subjectDF}")
     for item in subjectDF.values:
         SUBJECTS.append(item[0])
         TABLE_NAMES.append(item[1])
@@ -35,8 +35,6 @@ def processFile(request):
     subjBaseExists = FP.checkSubject(request.data['subject'])
     fileDF = pandas.DataFrame()
     fileDF = FP.processUploadedFile(request.data['uploadedFile'], request.data['fileType'])
-    #print(f"FileDF = \n{fileDF}")
-    #print(f"FileDF.dtypes = \n{fileDF.dtypes}")
 
     if not subjBaseExists:
         subjBaseExists = FP.createSubjectBase(fileDF, request.data['table'], request.data['subject'])

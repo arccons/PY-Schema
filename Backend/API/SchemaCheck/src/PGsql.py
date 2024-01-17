@@ -13,83 +13,75 @@ def commitCursor(DBconn):
     DBconn.commit()
 
 def getSubjectListSQL():
-    sql_stmt = f'SELECT DISTINCT "SUBJECT", "TABLE_NAME" from public."SUBJECTS"'
+    sql_stmt = f"SELECT DISTINCT subject, table_name from public.subjects"
     #print(f"Subject List SQL = {sql_stmt}")
     return sql_stmt
 
 def checkSubjectSQL(subject):
-    subj_str =f"'{subject}'"
-    sql_stmt = f'SELECT COUNT(*) from public."SUBJECTS" where "SUBJECT" = {subj_str}'
+    #subj_str =f"'{subject}'"
+    sql_stmt = f"SELECT COUNT(*) from public.subjects where subject = '{subject}'"
     #print(f"Subject SQL = {sql_stmt}")
     return sql_stmt
 
 def getTableSQL(subject):
-    subj_str =f"'{subject}'"
-    sql_stmt = f'SELECT st."TABLE_NAME" from public."SUBJECTS" st where st."SUBJECT" = {subj_str}'
+    #subj_str =f"'{subject}'"
+    sql_stmt = f"SELECT table_name from public.subjects st where subject = '{subject}'"
     #print(f"Table SQL = {sql_stmt}")
     return sql_stmt
 
 def getTableColumnsSQL(table):
-    table_str = f"'{table}'"
-    public_str = f"'public'"
-    #sql_stmt = f'SELECT col.ORDINAL_POSITION, col.column_name, col.data_type from INFORMATION_SCHEMA.COLUMNS col where col.TABLE_NAME = "{table}" ORDER BY col.ORDINAL_POSITION'
-    sql_stmt = f'SELECT col."ordinal_position", col."column_name", col."data_type" FROM information_schema.columns col WHERE table_schema = {public_str} AND table_name = {table_str}'
+    table_str = str.lower(table)
+    sql_stmt = f"SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{table_str}' ORDER BY ordinal_position"
     #print(f"Column List SQL = {sql_stmt}")
     return sql_stmt
 
 def createSubjectSQL(tableName, subject):
     valString = f"gen_random_uuid(), '{subject}', '{tableName}'"
-    sql_stmt = f'INSERT INTO public."SUBJECTS" ("ID", "SUBJECT", "TABLE_NAME") VALUES ({valString})'
+    sql_stmt = f"INSERT INTO public.subjects (id, subject, table_name) VALUES ({valString})"
     #print(f"New SUBJECT SQL = {sql_stmt}")
     return sql_stmt
 
 def createTableSQL(tableName):
-    sql_stmt = f'CREATE TABLE public."{tableName}" ("ID" uuid NOT NULL, "LOAD_TIMESTAMP" timestamp NOT NULL)'
+    sql_stmt = f"CREATE TABLE public.{tableName} (ID uuid NOT NULL, LOAD_TIMESTAMP timestamp NOT NULL)"
     #print(f"New Subject Table SQL = {sql_stmt}")
     return sql_stmt
 
 def createStagingTableSQL(tableName):
-    loaded_str = f"'LOADED'"
-    sql_stmt = f'CREATE TABLE public."{tableName}" ("ID" uuid NOT NULL, "STATUS" text NOT NULL DEFAULT({loaded_str}), "STATUSTIMESTAMP" timestamp NOT NULL)'
+    #loaded_str = f"'LOADED'"
+    sql_stmt = f"CREATE TABLE public.{tableName} (ID uuid NOT NULL, STATUS varchar(50) NOT NULL DEFAULT('LOADED'), STATUSTIMESTAMP timestamp NOT NULL)"
     #print(f"New Staging Table SQL = {sql_stmt}")
     return sql_stmt
 
 def addStringColumnSQL(table, colName):
-    sql_stmt = f'ALTER TABLE public."{table}" ADD "{colName}" varchar(255)'
+    sql_stmt = f"ALTER TABLE public.{table} ADD {colName} varchar(255)"
     #print(f"New String Column SQL = {sql_stmt}")
     return sql_stmt
 
 def addFloatColumnSQL(table, colName):
-    sql_stmt = f'ALTER TABLE public."{table}" ADD "{colName}" float'
+    sql_stmt = f"ALTER TABLE public.{table} ADD {colName} float"
     #print(f"New Float Column SQL = {sql_stmt}")
     return sql_stmt
 
 def addIntColumnSQL(table, colName):
-    sql_stmt = f'ALTER TABLE public."{table}" ADD "{colName}" numeric'
+    sql_stmt = f"ALTER TABLE public.{table} ADD {colName} numeric"
     #print(f"Add Int column SQL = {sql_stmt}")
     return sql_stmt
 
 def addBoolColumnSQL(table, colName):
-    sql_stmt = f'ALTER TABLE public."{table}" ADD "{colName}" boolean'
+    sql_stmt = f"ALTER TABLE public.{table} ADD {colName} boolean"
     #print(f"Add Boolean column SQL = {sql_stmt}")
     return sql_stmt
 
 def addDateColumnSQL(table, colName):
-    sql_stmt = f'ALTER TABLE public."{table}" ADD "{colName}" date'
+    sql_stmt = f"ALTER TABLE public.{table} ADD {colName} date"
     #print(f"Add column SQL = {sql_stmt}")
     return sql_stmt
 
 def addRecordSQL(table, tableColList, recordVals):
-    #print("tableColList = " + tableColList)
-    #print(type(tableColList), len(tableColList), str(tableColList))
-    #print(type(recordVals))
-    colString = f'"ID", "STATUSTIMESTAMP'
-    for i in range(len(tableColList)):
-        #print(str(tableColList[i]))
-        colString += f'", "' + str(tableColList[i])
-    colString += '"'
-    #print(colString)
-    valString = f'gen_random_uuid(), LOCALTIMESTAMP'
+    colString = f"ID, STATUSTIMESTAMP, "
+    colString += f', '.join(tableColList)
+    #print(f"Table columns: {colString}")
+    valString = f"gen_random_uuid(), LOCALTIMESTAMP"
 
     for i in range(len(recordVals)):
         itemString = ""
@@ -114,6 +106,6 @@ def addRecordSQL(table, tableColList, recordVals):
             itemString = str(recordVals[i])
 
         valString = valString + ', ' + itemString
-    #print(f"Column string = {colString}; Value string = {valString}")
-    sql_stmt = f'INSERT INTO public."{table}" ({colString}) VALUES({valString})'
+    sql_stmt = f"INSERT INTO public.{table} ({colString}) VALUES({valString})"
+    print(f"Add record - {table} : {valString}")
     return sql_stmt

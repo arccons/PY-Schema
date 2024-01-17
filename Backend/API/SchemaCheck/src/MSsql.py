@@ -28,7 +28,7 @@ def getTableSQL(subject):
     return sql_stmt
 
 def getTableColumnsSQL(table):
-    sql_stmt = f"SELECT col.ORDINAL_POSITION, col.column_name, col.data_type from INFORMATION_SCHEMA.COLUMNS col where col.TABLE_NAME = '{table}' ORDER BY col.ORDINAL_POSITION"
+    sql_stmt = f"SELECT column_name from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = '{table}' ORDER BY ORDINAL_POSITION"
     #print(f"Column List SQL = {sql_stmt}")
     return sql_stmt
 
@@ -101,5 +101,6 @@ def addRecordSQL(table, tableColList, recordVals):
 
         valString = valString + ', ' + itemString
         #print(f"Column string = {colString}; Value string = {valString}")
-        sql_stmt = f"INSERT INTO SchemaCheck.dbo.{table} ({colString}) VALUES({valString})"
+    sql_stmt = f"INSERT INTO SchemaCheck.dbo.{table} ({colString}) VALUES({valString})"
+    #print(f"Add record - {table} : {valString}")
     return sql_stmt

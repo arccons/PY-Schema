@@ -17,7 +17,6 @@ def checkSubject(subject):
     cursor = DBobjects[0]
     cursor.execute(DB.checkSubjectSQL(subject))
     row = cursor.fetchall()
-    #print(f"COUNT of Subject {subject} = {row[0][0]}")
     if row[0][0] != 1:
         return False
     return True
@@ -26,8 +25,8 @@ def getTable(subject):
     DBobjects = DB.connect_to_DB()
     cursor = DBobjects[0]
     cursor.execute(DB.getTableSQL(subject))
-    row = cursor.fetchone()
-    return row[0]
+    rowList = cursor.fetchall()
+    return rowList
 
 def getTableColumns(table):
     DBobjects = DB.connect_to_DB()
@@ -40,9 +39,11 @@ def getTableColumns(table):
 def createSubjectBase(tableName, subject):
     DBobjects = DB.connect_to_DB()
     cursor = DBobjects[0]
+    stgTableName = f"{tableName}_STG"
+    #print(f"Staging table name = {stgTableName}")
     cursor.execute(DB.createSubjectSQL(tableName, subject))
     cursor.execute(DB.createTableSQL(tableName))
-    cursor.execute(DB.createStagingTableSQL(tableName+'_STG'))
+    cursor.execute(DB.createStagingTableSQL(stgTableName))
     DB.commitCursor(DBobjects[1])
     return True
 
@@ -94,7 +95,7 @@ def addDateColumn(table, colName):
 def addRecords(table, tableColList, recordValList):
     DBobjects = DB.connect_to_DB()
     cur = DBobjects[0]
-    #print(type(tableColList), str(tableColList))
+    #print(type(tableColList), tableColList)
     for recordVal in recordValList:
         cur.execute(DB.addRecordSQL(table, tableColList, recordVal))
     DB.commitCursor(DBobjects[1])
